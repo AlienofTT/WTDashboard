@@ -66,7 +66,7 @@ class MyWindow(QtWidgets.QWidget):
 			if 'TAS, km/h' in state:
 				speed = int(state['TAS, km/h'])
 				refinedData.append('{}\t{} {}'.format('Accel', speed - self.lastSpeed, 'kph/s'))
-				self.lastAngle = speed
+				self.lastSpeed = speed
 			
 			if 'compass' in indicators:
 				angle = float(indicators['compass'])
