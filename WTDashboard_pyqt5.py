@@ -31,7 +31,7 @@ class MyWindow(QtWidgets.QWidget):
 		self.timer.start(1000)
 		
 		self.labels = []
-		for i in range(10):
+		for i in range(11):
 			label = QtWidgets.QLabel('INIT                                        ', self)
 			label.move(0, 30*i)
 			label.setStyleSheet(STYLE)
@@ -54,31 +54,30 @@ class MyWindow(QtWidgets.QWidget):
 		try:
 			stateResponse = requests.get('http://127.0.0.1:8111/state', timeout=0.1)
 			indicatorsResponse = requests.get('http://127.0.0.1:8111/indicators', timeout=0.1)
+			state = stateResponse.json()
+			indicators = indicatorsResponse.json()
 		except:
 			return False
 		
-		try:
-			state = stateResponse.json()
-			indicators = indicatorsResponse.json()
-			
-			refinedData = ['{}\t{} {}'.format(value[0], state[key], value[1]) for key, value in DATA_KEYS.items() if key in state]
-			
-			if 'TAS, km/h' in state:
-				speed = int(state['TAS, km/h'])
-				refinedData.append('{}\t{} {}'.format('Accel', speed - self.lastSpeed, 'kph/s'))
-				self.lastSpeed = speed
-			
-			if 'compass' in indicators:
-				angle = float(indicators['compass'])
-				deltaAngle = abs(angle - self.lastAngle)
-				refinedData.append('{}\t{} {}'.format('Turn', '%.2f' % deltaAngle if deltaAngle < 180 else '%.2f' % (360.0 - deltaAngle), ''))
-				self.lastAngle = angle
-			
-			refinedData.append('{}\t{} {}'.format('Time', datetime.now().strftime('%X'), ''))
-			
-			return refinedData
-		except KeyError:
-			return refinedData
+		if 'valid' not in indicators or indicators['valid'] == False or ('type' in indicators and indicators['type'] == 'dummy_plane'):
+			return False
+		
+		refinedData = ['{}\t{} {}'.format(value[0], state[key], value[1]) for key, value in DATA_KEYS.items() if key in state]
+		
+		if 'TAS, km/h' in state:
+			speed = int(state['TAS, km/h'])
+			refinedData.append('{}\t{} {}'.format('Accel', speed - self.lastSpeed, 'kph/s'))
+			self.lastSpeed = speed
+		
+		if 'compass' in indicators:
+			angle = float(indicators['compass'])
+			deltaAngle = abs(angle - self.lastAngle)
+			refinedData.append('{}\t{} {}'.format('Turn', '%.2f' % deltaAngle if deltaAngle < 180 else '%.2f' % (360.0 - deltaAngle), ''))
+			self.lastAngle = angle
+		
+		refinedData.append('{}\t{} {}'.format('Time', datetime.now().strftime('%X'), ''))
+		
+		return refinedData
 	
 
 
