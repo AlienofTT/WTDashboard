@@ -25,7 +25,8 @@ class MyWindow(QWidget):
 		super().__init__()
 		self.setGeometry(30, 360, 400, 400)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-		self.setWindowFlags(QtCore.Qt.WindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.Tool))
+		self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
+		self.setWindowFlags(QtCore.Qt.WindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.Tool | QtCore.Qt.BypassWindowManagerHint))
 		
 		#Set Tray
 		self.tray = QSystemTrayIcon()
@@ -91,6 +92,7 @@ class MyWindow(QWidget):
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
+	app.setApplicationName('AppName')
 	w = MyWindow()
 	w.show()
 	sys.exit(app.exec_())
